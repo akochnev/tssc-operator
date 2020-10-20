@@ -21,11 +21,27 @@
 
 === Testing
 
-describe Molecule testing
+Currently, the best way to test development progress on the operator is to execute an install and deployment into an existing OpenShift cluster.
+
+The process of releasing an operator into a catalog that can then be managed and deployed by OpenShift's OLM can be lengthy. For this reason, `hack/operate.sh` provides the means for: creating an operator image, pushing it to a registry and installing the operator from said public image. This allows for more effective and efficient cycles during the development phase of the operator. 
+
+In order to test this operator in an existing OpenShift cluster, please execute the following steps:
+
+. `$ oc login` <- as cluster admin
+. `$ docker login quay.io` <- login using your quay account where the images will be pushed/pulled for testing purposes
+. Create a repository in Quay.io called `tssc-operator`
+. Edit your local `./config/manager/kustomization.yaml` and `./hack/operate.conf` to point to your repository created in the previous step (don't stage and commit these changes upstream)
+. `$ hack/operate.sh -r` <- remove any existing deployments of the operator
+. `$ hack/operate.sh --push-only` <- build and push to Quay.io a copy of your local operator code
+. `$ hack/operate.sh` <- install the operator on your OpenShift cluster
+. `$ oc apply -f config/samples/redhatgov.io_tsscplatforms.yaml -n tssc-operator-system` <- deploy an instance of the TSSC operator from the CustomResourceDefinition into the `tssc-operator-system`
+
+Note: For development cycles, repeat steps 5-8.
 
 == PR Testing
 
 describe current TravisCI integration
 
 == Process for Publishing a Release of the Operator
+
 
